@@ -22,12 +22,12 @@ export default function Home() {
 
   return (
     <main>
+      <Search onCoordinatesChange={handleCoordinatesChange} />
       <WeatherDisplay
         lat={selectedCoordinates.lat}
         lon={selectedCoordinates.lon}
       />
       <Map lat={selectedCoordinates.lat} lon={selectedCoordinates.lon} />
-      <Search onCoordinatesChange={handleCoordinatesChange} />
     </main>
   );
 }

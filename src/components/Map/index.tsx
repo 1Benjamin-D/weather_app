@@ -1,4 +1,5 @@
 "use client";
+import { icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { FC, useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
@@ -7,7 +8,12 @@ interface MapProps {
   lat: number | null;
   lon: number | null;
 }
-
+const ICON = icon({
+  iconUrl: "./Image/map-marker-icon.png",
+  iconSize: [38, 38],
+  iconAnchor: [22, 55],
+  popupAnchor: [-3, -55],
+});
 // Composant pour ajuster dynamiquement le centre et le zoom de la carte
 const RecenterAndZoom: FC<MapProps> = ({ lat, lon }) => {
   const map = useMap();
@@ -35,7 +41,13 @@ const Map: FC<MapProps> = ({ lat, lon }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <RecenterAndZoom lat={lat} lon={lon} />
-      {lat && lon && <Marker position={[lat, lon]}></Marker>}
+      {lat && lon && (
+        <Marker position={[lat, lon]} icon={ICON}>
+          <Popup>
+            Coordonnées: {lat}, {lon}
+          </Popup>
+        </Marker>
+      )}
     </MapContainer>
   );
 };
