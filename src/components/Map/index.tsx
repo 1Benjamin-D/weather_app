@@ -9,7 +9,7 @@ interface MapProps {
   lon: number | null;
 }
 const ICON = icon({
-  iconUrl: "./Image/map-marker-icon.png",
+  iconUrl: "./Image/map-marker-icon-red.png",
   iconSize: [38, 38],
   iconAnchor: [22, 55],
   popupAnchor: [-3, -55],
