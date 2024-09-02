@@ -11,15 +11,21 @@ interface WeatherData {
   date: string;
 }
 
-export default function WeatherDisplay() {
+interface WeatherDisplayProps {
+  lat: number | null;
+  lon: number | null;
+}
+
+export default function WeatherDisplay({ lat, lon }: WeatherDisplayProps) {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fonction pour récupérer les données météo
     const fetchWeather = async () => {
+      if (lat === null || lon === null) return;
+
       try {
-        const response = await fetch("/api/weather");
+        const response = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch weather data");
@@ -34,11 +40,8 @@ export default function WeatherDisplay() {
     };
 
     fetchWeather();
-  }, []);
+  }, [lat, lon]);
 
-  // const temperatureCelsius = weatherData
-  //   ? (weatherData.temperature - 273.15).toFixed(2)
-  //   : "";
   const windSpeedKmh = weatherData
     ? (weatherData.windSpeed * 3.6).toFixed(2)
     : "";
@@ -49,8 +52,7 @@ export default function WeatherDisplay() {
         <div className="weather-data">
           <h2>{weatherData.city}</h2>
           <p>Date : {weatherData.date}</p>
-          {/* <p>Température : {temperatureCelsius} °C</p> */}
-          <p>Température 2: {weatherData.temperature} °C</p>
+          <p>Température : {weatherData.temperature} °C</p>
           <p>Nuages : {weatherData.clouds} %</p>
           <p>Humidité : {weatherData.humidity} %</p>
           <p>Vitesse du vent : {windSpeedKmh} km/h</p>

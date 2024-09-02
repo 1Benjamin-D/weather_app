@@ -1,13 +1,32 @@
 "use client";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer } from "react-leaflet";
-import { FC } from "react";
+import { FC, useEffect } from "react";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 
-const Map: FC = () => {
+interface MapProps {
+  lat: number | null;
+  lon: number | null;
+}
+
+// Composant pour ajuster dynamiquement le centre et le zoom de la carte
+const RecenterAndZoom: FC<MapProps> = ({ lat, lon }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (lat !== null && lon !== null) {
+      const newCenter: [number, number] = [lat, lon];
+      map.setView(newCenter, 12);
+    }
+  }, [lat, lon, map]);
+
+  return null;
+};
+
+const Map: FC<MapProps> = ({ lat, lon }) => {
   return (
     <MapContainer
-      center={[46.603354, 1.888334]}
-      zoom={5}
+      center={lat && lon ? [lat, lon] : [46.603354, 1.888334]}
+      zoom={lat && lon ? 12 : 5}
       scrollWheelZoom={true}
       className="h-80 w-96"
     >
@@ -15,6 +34,8 @@ const Map: FC = () => {
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <RecenterAndZoom lat={lat} lon={lon} />
+      {lat && lon && <Marker position={[lat, lon]}></Marker>}
     </MapContainer>
   );
 };

@@ -6,10 +6,14 @@ interface Address {
   city: string;
   postalCode: string;
   coordinates0: number; // longitude
-  coordinates1: number; // Latitude
+  coordinates1: number; // latitude
 }
 
-export default function Search() {
+interface SearchProps {
+  onCoordinatesChange: (lat: number, lon: number) => void;
+}
+
+export default function Search({ onCoordinatesChange }: SearchProps) {
   const [adresse, setAdresse] = useState<string>("");
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -31,16 +35,21 @@ export default function Search() {
           city: feature.properties.city,
           postalCode: feature.properties.postcode,
           coordinates0: feature.geometry.coordinates[0], // longitude
-          coordinates1: feature.geometry.coordinates[1], // Latitude
+          coordinates1: feature.geometry.coordinates[1], // latitude
         }))
         .filter(
           (address: Address) =>
             address.city.toLowerCase() === adresse.toLowerCase() ||
             address.postalCode === adresse
         );
+
       setAddresses(results);
-      console.log(results);
       setError(null);
+
+      if (results.length > 0) {
+        const { coordinates0, coordinates1 } = results[0];
+        onCoordinatesChange(coordinates1, coordinates0);
+      }
     } catch (err) {
       setError("Error fetching addresses");
       console.error("Error fetching addresses:", err);
@@ -60,7 +69,7 @@ export default function Search() {
         value={adresse}
         onChange={(e) => setAdresse(e.target.value)}
         onKeyDown={handleKeyPress}
-        placeholder="Rechercher une ville ..."
+        placeholder="Rechercher une ville ou un code postal..."
         className="border-2 border-black border-solid p-2"
       />
       <button

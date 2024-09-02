@@ -1,5 +1,3 @@
-// app/api/weather/route.ts
-
 import { NextResponse } from "next/server";
 
 interface WeatherData {
@@ -12,7 +10,10 @@ interface WeatherData {
   date: string;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const lat = searchParams.get("lat");
+  const lon = searchParams.get("lon");
   const apiKey = process.env.OPENWEATHER_API_KEY;
 
   if (!apiKey) {
@@ -23,9 +24,17 @@ export async function GET() {
     );
   }
 
+  if (!lat || !lon) {
+    console.error("Missing latitude or longitude");
+    return NextResponse.json(
+      { message: "Latitude or longitude is missing" },
+      { status: 400 }
+    );
+  }
+
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?lat=48.866667&lon=2.333333&units=metric&appid=${apiKey}`
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
     );
 
     if (!response.ok) {
