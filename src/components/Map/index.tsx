@@ -10,11 +10,11 @@ interface MapProps {
 }
 const ICON = icon({
   iconUrl: "./Image/map-marker-icon-red.png",
-  iconSize: [38, 38],
-  iconAnchor: [22, 55],
-  popupAnchor: [-3, -55],
+  iconSize: [38, 38], // Taille par défaut de l'icône
+  iconAnchor: [12, 41], // Point de l'icône correspondant à sa position
+  popupAnchor: [1, -34], // Position du popup par rapport à l'icône
 });
-// Composant pour ajuster dynamiquement le centre et le zoom de la carte
+
 const RecenterAndZoom: FC<MapProps> = ({ lat, lon }) => {
   const map = useMap();
 
