@@ -19,15 +19,18 @@ export default function Search({ onCoordinatesChange }: SearchProps) {
   const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async () => {
-    if (!adresse) return;
+    const trimmedAddress = adresse.trim(); // Supprimer les espaces au début et à la fin
+
+    if (!trimmedAddress) return;
+
     try {
       const response = await fetch(
         `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
-          adresse
+          trimmedAddress // Utiliser l'adresse sans espaces
         )}&autocomplete=1`
       );
       if (!response.ok) {
-        throw new Error("Adress Fetch failed");
+        throw new Error("Address Fetch failed");
       }
       const data = await response.json();
       const results = data.features
@@ -39,8 +42,8 @@ export default function Search({ onCoordinatesChange }: SearchProps) {
         }))
         .filter(
           (address: Address) =>
-            address.city.toLowerCase() === adresse.toLowerCase() ||
-            address.postalCode === adresse
+            address.city.toLowerCase() === trimmedAddress.toLowerCase() ||
+            address.postalCode === trimmedAddress
         );
 
       setAddresses(results);
