@@ -11,8 +11,8 @@ export default function Home() {
     lat: number | null;
     lon: number | null;
   }>({
-    lat: 48.8566, // Latitude de Paris par défaut
-    lon: 2.3522, // Longitude de Paris par défaut
+    lat: null,
+    lon: null,
   });
 
   // Fonction de rappel pour mettre à jour les coordonnées
@@ -24,8 +24,8 @@ export default function Home() {
     <main>
       <Search onCoordinatesChange={handleCoordinatesChange} />
       <WeatherDisplay
-        lat={selectedCoordinates.lat}
-        lon={selectedCoordinates.lon}
+        lat={selectedCoordinates.lat ?? 48.8566} // Latitude de Paris par défaut
+        lon={selectedCoordinates.lon ?? 2.3522} // Longitude de Paris par défaut
       />
       <Map lat={selectedCoordinates.lat} lon={selectedCoordinates.lon} />
     </main>
