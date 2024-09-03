@@ -46,17 +46,21 @@ export default function WeatherDisplay({ lat, lon }: WeatherDisplayProps) {
     ? (weatherData.windSpeed * 3.6).toFixed(2)
     : "";
 
+  const formattedDate = weatherData
+    ? new Date(weatherData.date).toLocaleDateString("fr-FR")
+    : "";
+
   return (
     <div>
       {weatherData ? (
         <div className="weather-data">
           <h2>{weatherData.city}</h2>
-          <p>Date : {weatherData.date}</p>
+          <p>Date : {formattedDate}</p>
+          <p>Description : {weatherData.weatherDescription}</p>
           <p>Température : {weatherData.temperature} °C</p>
           <p>Nuages : {weatherData.clouds} %</p>
           <p>Humidité : {weatherData.humidity} %</p>
           <p>Vitesse du vent : {windSpeedKmh} km/h</p>
-          <p>Description : {weatherData.weatherDescription}</p>
         </div>
       ) : error ? (
         <p className="text-red-500">{error}</p>
