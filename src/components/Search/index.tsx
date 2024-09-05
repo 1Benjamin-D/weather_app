@@ -16,17 +16,18 @@ interface SearchProps {
 export default function Search({ onCoordinatesChange }: SearchProps) {
   const [adresse, setAdresse] = useState<string>("");
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [suggestions, setSuggestions] = useState<Address[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async () => {
-    const trimmedAddress = adresse.trim(); // Supprimer les espaces au début et à la fin
+    const trimmedAddress = adresse.trim();
 
     if (!trimmedAddress) return;
 
     try {
       const response = await fetch(
         `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
-          trimmedAddress // Utiliser l'adresse sans espaces
+          trimmedAddress
         )}&autocomplete=1`
       );
       if (!response.ok) {
@@ -53,6 +54,7 @@ export default function Search({ onCoordinatesChange }: SearchProps) {
         const { coordinates0, coordinates1 } = results[0];
         onCoordinatesChange(coordinates1, coordinates0);
       }
+      setAddresses([]);
     } catch (err) {
       setError("Error fetching addresses");
       console.error("Error fetching addresses:", err);
@@ -65,12 +67,52 @@ export default function Search({ onCoordinatesChange }: SearchProps) {
     }
   };
 
+  const fetchSuggestions = async (query: string) => {
+    try {
+      const response = await fetch(
+        `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
+          query
+        )}&type=municipality&autocomplete=1&limit=5`
+      );
+      if (!response.ok) {
+        throw new Error("Suggestions Fetch failed");
+      }
+      const data = await response.json();
+      const suggestions = data.features.map((feature: any) => ({
+        city: feature.properties.city,
+        postalCode: feature.properties.postcode,
+        coordinates0: feature.geometry.coordinates[0], // longitude
+        coordinates1: feature.geometry.coordinates[1], // latitude
+      }));
+
+      setSuggestions(suggestions);
+    } catch (err) {
+      console.error("Error fetching suggestions:", err);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAdresse(value);
+    if (value.length > 2) {
+      fetchSuggestions(value);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (address: Address) => {
+    setAdresse(`${address.city} - ${address.postalCode}`);
+    setSuggestions([]);
+    onCoordinatesChange(address.coordinates1, address.coordinates0);
+  };
+
   return (
     <div>
       <input
         type="text"
         value={adresse}
-        onChange={(e) => setAdresse(e.target.value)}
+        onChange={handleInputChange}
         onKeyDown={handleKeyPress}
         placeholder="Rechercher une ville ou un code postal..."
         className="border-2 border-black border-solid p-2"
@@ -81,6 +123,20 @@ export default function Search({ onCoordinatesChange }: SearchProps) {
       >
         Rechercher
       </button>
+      {suggestions.length > 0 && (
+        <ul className="border-2 border-black border-solid mt-2">
+          {suggestions.map((suggestion) => (
+            <li
+              key={`${suggestion.city}-${suggestion.postalCode}`}
+              onClick={() => handleSuggestionClick(suggestion)}
+              className="cursor-pointer p-2 hover:bg-gray-200"
+            >
+              {suggestion.city} - {suggestion.postalCode}
+            </li>
+          ))}
+        </ul>
+      )}
+      {error && <p className="text-red-500">{error}</p>}
     </div>
   );
 }
