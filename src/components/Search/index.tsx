@@ -1,5 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
+import Image from "next/image";
 import { useState } from "react";
 
 interface Address {
@@ -109,20 +111,31 @@ export default function Search({ onCoordinatesChange }: SearchProps) {
 
   return (
     <div>
-      <input
-        type="text"
-        value={adresse}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyPress}
-        placeholder="Rechercher une ville ou un code postal..."
-        className="border-2 border-black border-solid p-2"
-      />
-      <button
-        onClick={handleSearch}
-        className="bg-blue-500 text-white p-2 mt-2"
+      <motion.div
+        initial={{ opacity: 0, y: -40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, delay: 0.5 }}
+        viewport={{ once: true }}
+        className="flex border-2 border-black border-solid w-fit items-center text-center p-1"
       >
-        Rechercher
-      </button>
+        <Image
+          src={"/Image/search.png"}
+          alt="search-icon"
+          width={25}
+          height={10}
+        />
+        <input
+          type="text"
+          value={adresse}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyPress}
+          placeholder="Saisissez votre ville"
+          className=" p-2 focus:outline-none"
+        />
+        <button onClick={handleSearch} className="bg-blue-700 text-white p-2">
+          Rechercher
+        </button>
+      </motion.div>
       {suggestions.length > 0 && (
         <ul className="border-2 border-black border-solid mt-2">
           {suggestions.map((suggestion) => (
