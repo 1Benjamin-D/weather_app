@@ -3,8 +3,10 @@
 import Map from "@/components/Map";
 import Search from "@/components/Search";
 import WeatherDisplay from "@/components/WeatherDisplay";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 
+const MapComponent = dynamic(() => import("../components/Map"), { ssr: false });
 export default function Home() {
   // État pour stocker les coordonnées sélectionnées
   const [selectedCoordinates, setSelectedCoordinates] = useState<{
@@ -30,7 +32,10 @@ export default function Home() {
           lat={selectedCoordinates.lat ?? 48.8566} // Latitude de Paris par défaut
           lon={selectedCoordinates.lon ?? 2.3522} // Longitude de Paris par défaut
         />
-        <Map lat={selectedCoordinates.lat} lon={selectedCoordinates.lon} />
+        <MapComponent
+          lat={selectedCoordinates.lat}
+          lon={selectedCoordinates.lon}
+        />
       </div>
       <h2 className="text-center mt-20">
         © 2024 Weather App (France). All rights reserved.
